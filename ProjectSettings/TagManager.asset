@@ -3,15 +3,17 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Pipe
+  - Point
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Background
   - Water
   - UI
-  - 
+  - Player
   - 
   - 
   - 
@@ -38,6 +40,12 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 3264306959
+    locked: 0
+  - name: Player
+    uniqueID: 2302604777
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
