@@ -8,6 +8,8 @@ namespace MyBird
 
         void Update()
         {
+            if (GameManager.IsDeath == true) return;
+
             MoveBackground();
         }
 

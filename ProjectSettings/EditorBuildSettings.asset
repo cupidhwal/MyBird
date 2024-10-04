@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/MyBird/1. Scenes/TitleScene.unity
+    guid: 0f4d54a4945bf264fb470bf5b806165d
+  - enabled: 1
     path: Assets/MyBird/1. Scenes/PlayScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   m_configObjects: {}

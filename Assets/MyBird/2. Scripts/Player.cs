@@ -12,7 +12,6 @@ namespace MyBird
         [SerializeField] private float turnSpeed = 100;
 
         private bool isJump = false;
-        private bool isStart = false;
 
         // 속성
         #region Properties
@@ -21,8 +20,11 @@ namespace MyBird
 
         // 컴포넌트
         private Rigidbody2D rb2D;
+
+        public SpawnManager spawnManager;
         #endregion
 
+        // 라이프 사이클
         #region Life Cycle
         private void Start()
         {
@@ -33,22 +35,24 @@ namespace MyBird
         private void Update()
         {
             Move();
+            Jump();
+            Rotation();
             JumpInput();
         }
 
         private void FixedUpdate()
         {
-            Jump();
-            Rotation();
-
             Stay();
         }
         #endregion
 
+        // 메서드
         #region Methods
         // 플레이어의 이동 메서드
         private void Move()
         {
+            if (GameManager.IsDeath == true) return;
+
             transform.Translate(moveSpeed * Time.deltaTime * Vector3.right, Space.World);
         }
 
@@ -57,6 +61,8 @@ namespace MyBird
         {
             /*if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
                 isJump = true;*/
+
+            if (GameManager.IsDeath == true) return;
 
             // 이런 방법도 있다!
             isJump |= Input.GetKeyDown(KeyCode.Space);
@@ -81,23 +87,63 @@ namespace MyBird
         // 플레이어의 점프 시 회전 메서드
         private void Rotation()
         {
+            if (GameManager.IsDeath == true) return;
+
             float rotation = turnSpeed * rb2D.velocity.magnitude * Time.deltaTime;
             rb2D.rotation = Mathf.Clamp(rb2D.rotation, -90f, 30f);
-            
+
             rb2D.rotation = (rb2D.velocity.y > 0) ? rb2D.rotation + rotation : rb2D.rotation - rotation;
+        }
+
+        // 플레이어의 점수 획득 메서드
+        private void GetPoint()
+        {
+            if (GameManager.IsDeath == true) return;
+
+            GameManager.Score++;
+        }
+
+        // 플레이어의 죽음 메서드
+        private void Die()
+        {
+            //두 번 죽음 방지
+            if (GameManager.IsDeath == true) return;
+
+            GameManager.IsDeath = true;
         }
 
         // 제자리에 대기 메서드
         private void Stay()
         {
-            if (isStart == true) return;
+            if (GameManager.IsStart == true) return;
 
             //rb2D.velocity = new Vector2(rb2D.velocity.x, 0);
 
             rb2D.AddForce(Physics.gravity.magnitude * Vector3.up, ForceMode2D.Force);
 
             if (Input.anyKey)
-                isStart = true;
+            {
+                GameManager.IsStart = true;
+                spawnManager.GenerateStart();
+            }
+        }
+        #endregion
+
+        // 이벤트 메서드
+        #region Event Methods
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (collision.tag == "Point")
+                GetPoint();
+
+            else if (collision.tag == "Pipe")
+                Die();
+        }
+
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (collision.gameObject.tag == "Ground")
+                Die();
         }
         #endregion
     }
