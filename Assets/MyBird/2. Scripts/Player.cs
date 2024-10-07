@@ -13,15 +13,19 @@ namespace MyBird
 
         private bool isJump = false;
 
-        // 속성
-        #region Properties
-        public float MoveSpeed => moveSpeed;
-        #endregion
-
         // 컴포넌트
         private Rigidbody2D rb2D;
 
-        public SpawnManager spawnManager;
+        // 클래스 컴포넌트
+        //public SpawnManager spawnManager;
+
+        // 오디오 소스
+        private AudioSource audioSource;
+        #endregion
+
+        // 속성
+        #region Properties
+        public float MoveSpeed => moveSpeed;
         #endregion
 
         // 라이프 사이클
@@ -29,6 +33,7 @@ namespace MyBird
         private void Start()
         {
             rb2D = GetComponent<Rigidbody2D>();
+            audioSource = GetComponent<AudioSource>();
         }
 
         // Update is called once per frame
@@ -64,9 +69,22 @@ namespace MyBird
 
             if (GameManager.IsDeath == true) return;
 
+#if UNITY_EDITOR
             // 이런 방법도 있다!
             isJump |= Input.GetKeyDown(KeyCode.Space);
             isJump |= Input.GetMouseButtonDown(0);
+#else
+            // 터치 인풋 처리
+            if (Input.touchCount > 0)
+            {
+                Touch touch = Input.GetTouch(0);
+
+                if (touch.phase == TouchPhase.Began)
+                {
+                    isJump |= true;
+                }
+            }
+#endif
         }
 
         // 플레이어의 점프 메서드
@@ -100,7 +118,17 @@ namespace MyBird
         {
             if (GameManager.IsDeath == true) return;
 
+            // 점수 획득
             GameManager.Score++;
+
+            // 포인트 획득 사운드 플레이
+            audioSource.Play();
+
+            // 기둥을 10개 통과할 때마다 난이도 상승 - 10점, 20점, 30점, ...
+            if (GameManager.Score % 10 == 0)
+            {
+                SpawnManager.levelTime += 0.05f;
+            }
         }
 
         // 플레이어의 죽음 메서드
@@ -124,10 +152,10 @@ namespace MyBird
             if (Input.anyKey)
             {
                 GameManager.IsStart = true;
-                spawnManager.GenerateStart();
+                //spawnManager.GenerateStart();
             }
         }
-        #endregion
+#endregion
 
         // 이벤트 메서드
         #region Event Methods
